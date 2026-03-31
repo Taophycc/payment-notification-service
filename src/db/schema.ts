@@ -4,27 +4,39 @@ import {
   pgTable,
   varchar,
   jsonb,
+  uuid,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 
+export const paymentStatusEnum = pgEnum("payment_status", [
+  "pending",
+  "success",
+  "failed",
+]);
+export const notificationStatusEnum = pgEnum("notification_status", [
+  "pending",
+  "sent",
+  "failed",
+]);
+
 export const users = pgTable("users", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  first_name: varchar(),
-  email: varchar(),
-  hashed_password: varchar(),
-  refresh_token: varchar(),
-  created_at: timestamp().defaultNow().notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const transactions = pgTable("transactions", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  first_name: varchar().notNull(),
-  last_name: varchar().notNull(),
-  paystack_reference: varchar().notNull().unique(),
-  event_type: varchar(),
-  amount: integer().notNull(),
-  currency: varchar().notNull(),
-  customer_email: varchar(),
-  status: varchar().notNull(),
-  raw_payload: jsonb().notNull(),
-  created_at: timestamp().defaultNow().notNull(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  paystackReference: varchar("paystack_reference", { length: 255 })
+    .notNull()
+    .unique(),
+  rawPayload: jsonb("raw_payload").notNull(),
+  customerEmail: varchar(),
+  eventType: varchar(),
+  amount: integer("amount").notNull(),
+  currency: varchar("currency", { length: 3 }).notNull().default("NGN"),
+  status: paymentStatusEnum("status").notNull().default("pending"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

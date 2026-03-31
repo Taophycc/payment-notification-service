@@ -1,5 +1,5 @@
 {
-  "id": "31e1b5ff-9091-4299-950e-502990be9ede",
+  "id": "6f242777-dbb2-4d00-b7d4-2a2c93d9bd53",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -10,41 +10,31 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "transactions_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "2147483647",
-            "cache": "1",
-            "cycle": false
-          }
-        },
-        "first_name": {
-          "name": "first_name",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "last_name": {
-          "name": "last_name",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
+          "default": "gen_random_uuid()"
         },
         "paystack_reference": {
           "name": "paystack_reference",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
-        "event_type": {
-          "name": "event_type",
+        "raw_payload": {
+          "name": "raw_payload",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customerEmail": {
+          "name": "customerEmail",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "eventType": {
+          "name": "eventType",
           "type": "varchar",
           "primaryKey": false,
           "notNull": false
@@ -57,30 +47,28 @@
         },
         "currency": {
           "name": "currency",
-          "type": "varchar",
+          "type": "varchar(3)",
           "primaryKey": false,
-          "notNull": true
-        },
-        "customer_email": {
-          "name": "customer_email",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "'NGN'"
         },
         "status": {
           "name": "status",
-          "type": "varchar",
+          "type": "payment_status",
+          "typeSchema": "public",
           "primaryKey": false,
-          "notNull": true
-        },
-        "raw_payload": {
-          "name": "raw_payload",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'pending'"
         },
         "created_at": {
           "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
@@ -109,44 +97,22 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "integer",
+          "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "identity": {
-            "type": "always",
-            "name": "users_id_seq",
-            "schema": "public",
-            "increment": "1",
-            "startWith": "1",
-            "minValue": "1",
-            "maxValue": "2147483647",
-            "cache": "1",
-            "cycle": false
-          }
-        },
-        "first_name": {
-          "name": "first_name",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
+          "default": "gen_random_uuid()"
         },
         "email": {
           "name": "email",
-          "type": "varchar",
+          "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
-        "hashed_password": {
-          "name": "hashed_password",
-          "type": "varchar",
+        "password_hash": {
+          "name": "password_hash",
+          "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": false
-        },
-        "refresh_token": {
-          "name": "refresh_token",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
@@ -159,13 +125,40 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.notification_status": {
+      "name": "notification_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "sent",
+        "failed"
+      ]
+    },
+    "public.payment_status": {
+      "name": "payment_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "success",
+        "failed"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},

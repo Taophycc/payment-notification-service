@@ -1,11 +1,28 @@
 import "dotenv/config";
-import Fastify from "fastify";
+import Fastify, { FastifyRequest, FastifyReply } from "fastify";
+import webhookRoutes from "./routes/webhook.route";
 
 const fastify = Fastify({
   logger: true,
 });
 
-fastify.get("/", function (_, reply) {
+fastify.register(webhookRoutes, { prefix: "/api" });
+
+fastify.addContentTypeParser(
+  "application/json",
+  { parseAs: "buffer" },
+  function (req, body, done) {
+    try {
+      req.rawBody = body as Buffer;
+      const json = JSON.parse(body.toString());
+      done(null, json);
+    } catch (err) {
+      done(err as Error, undefined);
+    }
+  },
+);
+
+fastify.get("/", function (_, reply: FastifyReply) {
   reply.send({ Hello: "World!" });
 });
 
