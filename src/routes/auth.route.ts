@@ -6,12 +6,11 @@ import {
   logOut,
 } from "../controllers/auth.controller";
 import { authenticate } from "../middleware/authenticate";
-// import { getTransactions } from "../services/transaction.service";
+import { getDashboardTransactions } from "../controllers/dashboard.controller";
 
 export default async function authRoutes(fastify: FastifyInstance) {
   fastify.post("/auth/register", register);
   fastify.post("/auth/login", login(fastify));
   fastify.post("/auth/refresh", refresh(fastify));
   fastify.post("/auth/logout", { preHandler: authenticate }, logOut);
-//   fastify.get("/transactions", { preHandler: authenticate }, getTransactions);
 }

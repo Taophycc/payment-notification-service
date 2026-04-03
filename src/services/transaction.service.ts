@@ -1,6 +1,7 @@
 import { db } from "../db/index";
 import { transactions } from "../db/schema";
 import { PaystackWebhookPayload } from "../types/paystack";
+import { desc } from "drizzle-orm";
 
 const validStatuses = ["pending", "success", "failed"] as const;
 type ValidStatus = (typeof validStatuses)[number];
@@ -22,4 +23,22 @@ export const createTransaction = async (body: PaystackWebhookPayload) => {
       rawPayload: body,
     })
     .onConflictDoNothing();
+};
+
+export const getTransactions = async (limit: number, offset: number) => {
+  return await db
+    .select({
+      id: transactions.id,
+      paystackReference: transactions.paystackReference,
+      amount: transactions.amount,
+      currency: transactions.currency,
+      status: transactions.status,
+      customerEmail: transactions.customerEmail,
+      eventType: transactions.eventType,
+      createdAt: transactions.createdAt,
+    })
+    .from(transactions)
+    .orderBy(desc(transactions.createdAt))
+    .limit(limit)
+    .offset(offset);
 };

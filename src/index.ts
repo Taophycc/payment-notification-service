@@ -1,10 +1,10 @@
 import "dotenv/config";
-import Fastify, { FastifyRequest, FastifyReply } from "fastify";
+import Fastify, { FastifyReply } from "fastify";
 import fastifyJwt from "@fastify/jwt";
 import fastifyCookie from "@fastify/cookie";
 import webhookRoutes from "./routes/webhook.route";
 import authRoutes from "./routes/auth.route";
-// import dashboardRoutes from "./routes/dashboard.route";
+import dashboardRoutes from "./routes/dashboard.route";
 
 const fastify = Fastify({
   logger: true,
@@ -34,7 +34,7 @@ fastify.addContentTypeParser(
 
 fastify.register(webhookRoutes, { prefix: "/api" });
 fastify.register(authRoutes, { prefix: "/api" });
-// fastify.register(dashboardRoutes, { prefix: "/api" });
+fastify.register(dashboardRoutes, { prefix: "/api" });
 
 fastify.get("/", function (_, reply: FastifyReply) {
   reply.send({ Hello: "World!" });
