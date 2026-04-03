@@ -13,16 +13,17 @@ export const paymentStatusEnum = pgEnum("payment_status", [
   "success",
   "failed",
 ]);
-export const notificationStatusEnum = pgEnum("notification_status", [
-  "pending",
-  "sent",
-  "failed",
-]);
+// export const notificationStatusEnum = pgEnum("notification_status", [
+//   "pending",
+//   "sent",
+//   "failed",
+// ]);
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+  refreshToken: varchar("refresh_token", { length: 500 }),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
