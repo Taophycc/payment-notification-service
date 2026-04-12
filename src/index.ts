@@ -2,13 +2,25 @@ import "dotenv/config";
 import Fastify, { FastifyReply } from "fastify";
 import fastifyJwt from "@fastify/jwt";
 import fastifyCookie from "@fastify/cookie";
+import fastifyFormBody from "@fastify/formbody";
 import webhookRoutes from "./routes/webhook.route";
 import authRoutes from "./routes/auth.route";
 import dashboardRoutes from "./routes/dashboard.route";
+import uiRoute from "./routes/ui.route";
+import fastifyView from "@fastify/view";
+import ejs from "ejs";
+import path from "path";
 
 const fastify = Fastify({
   logger: true,
 });
+
+await fastify.register(fastifyView, {
+  engine: { ejs },
+  root: path.join(process.cwd(), "views"),
+});
+
+await fastify.register(fastifyFormBody);
 
 await fastify.register(fastifyJwt, {
   secret: process.env.JWT_ACCESS_SECRET!,
@@ -35,6 +47,7 @@ fastify.addContentTypeParser(
 fastify.register(webhookRoutes, { prefix: "/api" });
 fastify.register(authRoutes, { prefix: "/api" });
 fastify.register(dashboardRoutes, { prefix: "/api" });
+fastify.register(uiRoute);
 
 fastify.get("/", function (_, reply: FastifyReply) {
   reply.send({ Hello: "World!" });

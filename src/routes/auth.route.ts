@@ -6,7 +6,6 @@ import {
   logOut,
 } from "../controllers/auth.controller";
 import { authenticate } from "../middleware/authenticate";
-import { getDashboardTransactions } from "../controllers/dashboard.controller";
 
 export default async function authRoutes(fastify: FastifyInstance) {
   fastify.post("/auth/register", register);
