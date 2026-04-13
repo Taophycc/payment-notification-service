@@ -3,16 +3,28 @@ import Fastify, { FastifyReply } from "fastify";
 import fastifyJwt from "@fastify/jwt";
 import fastifyCookie from "@fastify/cookie";
 import fastifyFormBody from "@fastify/formbody";
+import fastifyView from "@fastify/view";
+import fastifyCors from "@fastify/cors";
+import fastifyRateLimit from "@fastify/rate-limit";
 import webhookRoutes from "./routes/webhook.route";
 import authRoutes from "./routes/auth.route";
 import dashboardRoutes from "./routes/dashboard.route";
 import uiRoute from "./routes/ui.route";
-import fastifyView from "@fastify/view";
 import ejs from "ejs";
 import path from "path";
 
 const fastify = Fastify({
   logger: true,
+});
+
+await fastify.register(fastifyCors, {
+  origin: process.env.ALLOWED_ORIGIN || "http://localhost:3000",
+  credentials: true,
+});
+
+await fastify.register(fastifyRateLimit, {
+  max: 100,
+  timeWindow: "1 minute",
 });
 
 await fastify.register(fastifyView, {

@@ -3,6 +3,7 @@ import { users } from "../db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import { config } from "../config/index";
 
 const hashToken = (token: string) =>
   crypto.createHash("sha256").update(token).digest("hex");
@@ -16,7 +17,7 @@ export const registerUser = async (email: string, password: string) => {
     throw new Error("Email already exists");
   }
 
-  const hash = await bcrypt.hash(password, 12);
+  const hash = await bcrypt.hash(password, config.bcrypt.saltRounds);
 
   const [newUser] = await db
     .insert(users)

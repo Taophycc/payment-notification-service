@@ -6,6 +6,7 @@ import {
   rotateRefreshToken,
   logOutUser,
 } from "../services/auth.service";
+import { config } from "../config/index";
 
 export const register = async (
   request: FastifyRequest,
@@ -44,12 +45,12 @@ export const login =
 
       const accessToken = fastify.jwt.sign(
         { id: user.id, email: user.email },
-        { expiresIn: "15m" },
+        { expiresIn: config.jwt.accessTokenExpiry },
       );
 
       const refreshToken = fastify.jwt.sign(
         { id: user.id },
-        { expiresIn: "7d" },
+        { expiresIn: config.jwt.refreshTokenExpiry },
       );
 
       await saveRefreshToken(user.id, refreshToken);
