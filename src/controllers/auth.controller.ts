@@ -87,12 +87,12 @@ export const refresh =
 
       const newAccessToken = fastify.jwt.sign(
         { id: user.id, email: user.email },
-        { expiresIn: "15m" },
+        { expiresIn: config.jwt.accessTokenExpiry },
       );
 
       const newRefreshToken = fastify.jwt.sign(
         { id: user.id },
-        { expiresIn: "7d" },
+        { expiresIn: config.jwt.refreshTokenExpiry },
       );
 
       await saveRefreshToken(user.id, newRefreshToken);
