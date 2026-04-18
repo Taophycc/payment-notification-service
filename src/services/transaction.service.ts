@@ -11,7 +11,7 @@ export const createTransaction = async (body: PaystackWebhookPayload) => {
     ? (body.data.status as ValidStatus)
     : "pending";
 
-  await db
+  const [transaction] = await db
     .insert(transactions)
     .values({
       paystackReference: body.data.reference,
@@ -22,7 +22,9 @@ export const createTransaction = async (body: PaystackWebhookPayload) => {
       status,
       rawPayload: body,
     })
-    .onConflictDoNothing();
+    .onConflictDoNothing()
+    .returning();
+  return transaction;
 };
 
 export const getTransactions = async (limit: number, offset: number) => {

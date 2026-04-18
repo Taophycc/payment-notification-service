@@ -6,6 +6,7 @@ import {
   jsonb,
   uuid,
   pgEnum,
+  text,
 } from "drizzle-orm/pg-core";
 
 export const paymentStatusEnum = pgEnum("payment_status", [
@@ -13,11 +14,12 @@ export const paymentStatusEnum = pgEnum("payment_status", [
   "success",
   "failed",
 ]);
-// export const notificationStatusEnum = pgEnum("notification_status", [
-//   "pending",
-//   "sent",
-//   "failed",
-// ]);
+
+export const notificationStatusEnum = pgEnum("notification_status", [
+  "pending",
+  "sent",
+  "failed",
+]);
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -40,4 +42,16 @@ export const transactions = pgTable("transactions", {
   status: paymentStatusEnum("status").notNull().default("pending"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const notifications = pgTable("notifications", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  paymentId: uuid("payment_id")
+    .notNull()
+    .references(() => transactions.id, { onDelete: "cascade" }),
+  type: varchar("type", { length: 100 }).notNull(),
+  status: notificationStatusEnum("status").notNull().default("pending"),
+  message: text("message"),
+  sentAt: timestamp("sent_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
