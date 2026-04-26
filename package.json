@@ -34,7 +34,8 @@
     "fastify": "^5.8.4",
     "pg": "^8.20.0",
     "postgres": "^3.4.8",
-    "resend": "^6.11.0"
+    "resend": "^6.11.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

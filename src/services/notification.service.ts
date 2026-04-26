@@ -3,12 +3,12 @@ import { db } from "../db/index";
 import { notifications } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { paymentConfirmationTemplate } from "../templates/paymentConfirmation";
-import { PaystackWebhookPayload } from "../types/paystack";
+import { PaystackWebhookInput } from "../validators/webhook.validator";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendPaymentNotification = async (
-  body: PaystackWebhookPayload,
+  body: PaystackWebhookInput,
   transactionId: string,
 ) => {
   const [notification] = await db
@@ -21,14 +21,13 @@ export const sendPaymentNotification = async (
     })
     .returning();
 
-
-    const html = paymentConfirmationTemplate({
-      firstName: body.data.customer.first_name,
-      amount: body.data.amount / 100,
-      currency: body.data.currency,
-      reference: body.data.reference,
-      date: new Date().toLocaleDateString("en-NG", { timeZone: "Africa/Lagos" }),
-    });
+  const html = paymentConfirmationTemplate({
+    firstName: body.data.customer.first_name,
+    amount: body.data.amount / 100,
+    currency: body.data.currency,
+    reference: body.data.reference,
+    date: new Date().toLocaleDateString("en-NG", { timeZone: "Africa/Lagos" }),
+  });
 
   try {
     await resend.emails.send({
@@ -36,7 +35,7 @@ export const sendPaymentNotification = async (
       to:
         process.env.NODE_ENV === "production"
           ? body.data.customer.email
-          : process.env.TEST_EMAIL,
+          : process.env.TEST_EMAIL!,
       subject: "Payment Confirmed",
       html,
     });

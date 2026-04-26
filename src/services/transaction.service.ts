@@ -1,12 +1,12 @@
 import { db } from "../db/index";
 import { transactions } from "../db/schema";
-import { PaystackWebhookPayload } from "../types/paystack";
+import { PaystackWebhookInput } from "../validators/webhook.validator";
 import { desc } from "drizzle-orm";
 
 const validStatuses = ["pending", "success", "failed"] as const;
 type ValidStatus = (typeof validStatuses)[number];
 
-export const createTransaction = async (body: PaystackWebhookPayload) => {
+export const createTransaction = async (body: PaystackWebhookInput) => {
   const status = validStatuses.includes(body.data.status as ValidStatus)
     ? (body.data.status as ValidStatus)
     : "pending";

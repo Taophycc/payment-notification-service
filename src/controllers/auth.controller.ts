@@ -6,6 +6,9 @@ import {
   rotateRefreshToken,
   logOutUser,
 } from "../services/auth.service";
+import { z } from "zod";
+import { registerSchema, loginSchema } from "../validators/auth.validator";
+import { RegisterInput, LoginInput } from "../validators/auth.validator";
 import { config } from "../config/index";
 
 export const register = async (
@@ -13,10 +16,16 @@ export const register = async (
   reply: FastifyReply,
 ) => {
   try {
-    const { email, password } = request.body as {
-      email: string;
-      password: string;
-    };
+    const body = registerSchema.safeParse(request.body);
+
+    if (!body.success) {
+      return reply.status(400).send({
+        message: "Validation failed",
+        errors: z.treeifyError(body.error),
+      });
+    }
+
+    const { email, password } = body.data;
 
     const user = await registerUser(email, password);
 
@@ -36,10 +45,16 @@ export const login =
   (fastify: FastifyInstance) =>
   async (request: FastifyRequest, reply: FastifyReply) => {
     try {
-      const { email, password } = request.body as {
-        email: string;
-        password: string;
-      };
+      const body = loginSchema.safeParse(request.body);
+
+      if (!body.success) {
+        return reply.status(400).send({
+          message: "Validation failed",
+          errors: body.error.flatten().fieldErrors,
+        });
+      }
+
+      const { email, password } = request.body as LoginInput;
 
       const user = await loginUser(email, password);
 
