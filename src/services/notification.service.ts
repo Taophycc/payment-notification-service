@@ -22,7 +22,7 @@ export const sendPaymentNotification = async (
     .returning();
 
   const html = paymentConfirmationTemplate({
-    firstName: body.data.customer.first_name,
+    firstName: body.data.customer.first_name ?? "Customer",
     amount: body.data.amount / 100,
     currency: body.data.currency,
     reference: body.data.reference,
