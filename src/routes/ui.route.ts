@@ -1,4 +1,5 @@
 import { FastifyInstance } from "fastify";
+import { env } from "../config/env";
 import { loginUser } from "../services/auth.service";
 import { logOutUser } from "../services/auth.service";
 import { saveRefreshToken } from "../services/auth.service";
@@ -39,14 +40,14 @@ export default async function uiRoutes(fastify: FastifyInstance) {
 
       reply.setCookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         sameSite: "strict",
         path: "/",
       });
 
       reply.setCookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         sameSite: "strict",
         path: "/",
       });

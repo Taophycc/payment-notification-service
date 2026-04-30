@@ -1,3 +1,5 @@
+import { env } from "../config/env";
+
 const PAYSTACK_BASE_URL = "https://api.paystack.co";
 
 export const initializePayment = async (
@@ -9,7 +11,7 @@ export const initializePayment = async (
   const response = await fetch(`${PAYSTACK_BASE_URL}/transaction/initialize`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+      Authorization: `Bearer ${env.PAYSTACK_SECRET_KEY}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -41,7 +43,7 @@ export const verifyPayment = async (reference: string) => {
     {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        Authorization: `Bearer ${env.PAYSTACK_SECRET_KEY}`,
       },
     },
   );

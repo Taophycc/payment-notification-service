@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { env } from "./config/env";
 import Fastify, { FastifyReply } from "fastify";
 import fastifyJwt from "@fastify/jwt";
 import fastifyCookie from "@fastify/cookie";
@@ -20,7 +21,7 @@ const fastify = Fastify({
 });
 
 await fastify.register(fastifyCors, {
-  origin: process.env.ALLOWED_ORIGIN || "http://localhost:3000",
+  origin: env.ALLOWED_ORIGIN || "http://localhost:3000",
   credentials: true,
 });
 
@@ -37,11 +38,11 @@ await fastify.register(fastifyView, {
 await fastify.register(fastifyFormBody);
 
 await fastify.register(fastifyJwt, {
-  secret: process.env.JWT_ACCESS_SECRET!,
+  secret: env.JWT_ACCESS_SECRET,
 });
 
 await fastify.register(fastifyCookie, {
-  secret: process.env.JWT_REFRESH_SECRET!,
+  secret: env.JWT_REFRESH_SECRET,
 });
 
 fastify.addContentTypeParser(

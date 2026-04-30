@@ -35,7 +35,7 @@ export const transactions = pgTable("transactions", {
     .notNull()
     .unique(),
   rawPayload: jsonb("raw_payload").notNull(),
-  customerEmail: varchar(),
+  customerEmail: varchar("customer_email", { length: 255 }),
   eventType: varchar(),
   amount: integer("amount").notNull(),
   currency: varchar("currency", { length: 3 }).notNull().default("NGN"),

@@ -1,11 +1,12 @@
 import { Resend } from "resend";
+import { env } from "../config/env";
 import { db } from "../db/index";
 import { notifications } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { paymentConfirmationTemplate } from "../templates/paymentConfirmation";
 import { PaystackWebhookInput } from "../validators/webhook.validator";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(env.RESEND_API_KEY);
 
 export const sendPaymentNotification = async (
   body: PaystackWebhookInput,
@@ -33,9 +34,9 @@ export const sendPaymentNotification = async (
     await resend.emails.send({
       from: "onboarding@resend.dev",
       to:
-        process.env.NODE_ENV === "production"
+        env.NODE_ENV === "production"
           ? body.data.customer.email
-          : process.env.TEST_EMAIL!,
+          : env.TEST_EMAIL!,
       subject: "Payment Confirmed",
       html,
     });

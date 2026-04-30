@@ -9,6 +9,7 @@ import {
 import { z } from "zod";
 import { registerSchema, loginSchema } from "../validators/auth.validator";
 import { config } from "../config/index";
+import { env } from "../config/env";
 
 export const register = async (req: FastifyRequest, reply: FastifyReply) => {
   const body = registerSchema.safeParse(req.body);
@@ -93,7 +94,7 @@ export const login =
 
       reply.setCookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         sameSite: "strict",
         path: "/",
       });
@@ -150,7 +151,7 @@ export const refresh =
 
       reply.setCookie("refreshToken", newRefreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: env.NODE_ENV === "production",
         sameSite: "strict",
         path: "/",
       });

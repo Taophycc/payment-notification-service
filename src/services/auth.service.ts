@@ -4,9 +4,10 @@ import { eq } from "drizzle-orm";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { config } from "../config/index";
+import { env } from "../config/env";
 
 const hashToken = (token: string) =>
-  crypto.createHash("sha256").update(token).digest("hex");
+  crypto.createHmac("sha256", env.JWT_REFRESH_SECRET).update(token).digest("hex");
 
 export const registerUser = async (email: string, password: string) => {
   const existingUser = await db

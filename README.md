@@ -19,7 +19,7 @@ A production-grade backend service that receives and processes Paystack payment 
 - Payment initialization and verification via Paystack API
 - Idempotent transaction storage — duplicate webhooks are safely ignored
 - Email notifications on successful payments via Resend
-- Notification records stored with outbox pattern — no notification is silently lost
+- Notification state tracking — every notification is recorded as pending before sending, then updated to sent or failed
 - JWT authentication with short-lived access tokens (15min) and rotating refresh tokens (7 days)
 - Refresh token hashed before storage — protects against database compromise
 - Stolen token detection — replayed refresh tokens immediately invalidate the session
@@ -48,6 +48,31 @@ views/
   login.ejs       — Admin login page
   dashboard.ejs   — Transactions dashboard
 ```
+
+## Architecture
+
+```
+Client / Paystack
+      │
+      ▼
+POST /api/webhook
+      │
+      ├── Verify HMAC-SHA512 signature
+      │         │ invalid → 401
+      │
+      ├── Filter charge events (charge.success / charge.failed / charge.pending)
+      │         │ other events → 200 (ignored)
+      │
+      ├── Insert transaction record (idempotent — duplicate references ignored)
+      │
+      └── On charge.success:
+              │
+              ├── Insert notification record (status: pending)
+              ├── Send email via Resend
+              └── Update notification status → sent | failed
+```
+
+The dashboard is a separate authenticated surface that reads the same transaction and notification records written by the webhook flow.
 
 ## Getting Started
 
@@ -280,13 +305,20 @@ pnpm docker:down:v      # stop containers and wipe volumes
 
 - **HMAC-SHA512** — Paystack webhook signature verified with `crypto.timingSafeEqual` to prevent timing attacks
 - **Idempotency** — unique constraint on `paystack_reference` at the database level prevents duplicate transaction records
-- **Refresh token hashing** — refresh tokens stored as SHA-256 hashes, raw tokens never persisted
+- **Refresh token hashing** — refresh tokens stored as HMAC-SHA256 hashes keyed to the server secret, raw tokens never persisted
 - **Token rotation** — each refresh burns the old token and issues a new one
 - **Stolen token detection** — replayed refresh tokens immediately null the session and force re-login
 - **httpOnly cookies** — refresh tokens stored in httpOnly cookies, inaccessible to JavaScript
 - **Rate limiting** — auth routes limited to 5 requests per minute to prevent brute force
 - **CORS** — restricted to configured allowed origins
 - **Input validation** — all routes validated with Zod before touching business logic
+
+## Roadmap
+
+- [ ] Message queue (BullMQ / RabbitMQ) for async notification dispatch and retry with exponential backoff
+- [ ] Unit, integration, and load tests
+- [ ] Graceful shutdown with in-flight request draining
+- [ ] Dead letter queue for persistently failed notifications
 
 ## Notes
 

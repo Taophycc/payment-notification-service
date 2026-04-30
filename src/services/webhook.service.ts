@@ -1,14 +1,10 @@
 import crypto from "crypto";
 import { FastifyRequest } from "fastify";
+import { env } from "../config/env";
 
 const verifySignature = (req: FastifyRequest): boolean => {
   const signature = req.headers["x-paystack-signature"] as string;
-  const secret = process.env.PAYSTACK_SECRET_KEY;
-
-  if (!secret) {
-    console.error(" PAYSTACK_WEBHOOK_SECRET is missing in .env");
-    return false;
-  }
+  const secret = env.PAYSTACK_SECRET_KEY;
 
   if (!signature) {
     return false;

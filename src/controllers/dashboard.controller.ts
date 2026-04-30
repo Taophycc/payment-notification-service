@@ -1,15 +1,19 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { getTransactions } from "../services/transaction.service";
+import { paginationSchema } from "../validators/payment.validator";
 
 export const getDashboardTransactions = async (
   req: FastifyRequest,
   reply: FastifyReply,
 ) => {
+  const parsed = paginationSchema.safeParse(req.query);
+  if (!parsed.success) {
+    req.log.warn({ errors: parsed.error.issues, msg: "Invalid pagination params" });
+    return reply.status(400).send({ message: parsed.error.issues[0].message });
+  }
+  const { page, limit } = parsed.data;
+
   try {
-    const { page = 1, limit = 10 } = req.query as {
-      page: number;
-      limit: number;
-    };
     const offset = (page - 1) * limit;
     const transaction = await getTransactions(limit, offset);
     req.log.info({
