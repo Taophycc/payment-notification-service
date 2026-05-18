@@ -1,8 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { env } from "../config/env";
-import { loginUser } from "../services/auth.service";
-import { logOutUser } from "../services/auth.service";
-import { saveRefreshToken } from "../services/auth.service";
+import { loginUser, saveRefreshToken } from "../services/auth.service";
 import { getTransactions } from "../services/transaction.service";
 import { authenticateUI } from "../middleware/authenticate";
 
@@ -31,10 +29,7 @@ export default async function uiRoutes(fastify: FastifyInstance) {
         { expiresIn: "15m" },
       );
 
-      const refreshToken = fastify.jwt.sign(
-        { id: user.id },
-        { expiresIn: "7d" },
-      );
+      const refreshToken = fastify.jwt.sign({ id: user.id }, { expiresIn: "7d" });
 
       await saveRefreshToken(user.id, refreshToken);
 
@@ -53,17 +48,13 @@ export default async function uiRoutes(fastify: FastifyInstance) {
       });
 
       return reply.redirect("/dashboard");
-    } catch (err: any) {
+    } catch (_err) {
       return reply.view("login.ejs", { error: "Invalid email or password" });
     }
   });
 
-  fastify.get(
-    "/dashboard",
-    { preHandler: authenticateUI },
-    async (_, reply) => {
-      const transactions = await getTransactions(10, 0);
-      return reply.view("dashboard.ejs", { transactions });
-    },
-  );
+  fastify.get("/dashboard", { preHandler: authenticateUI }, async (_, reply) => {
+    const transactions = await getTransactions(10, 0);
+    return reply.view("dashboard.ejs", { transactions });
+  });
 }

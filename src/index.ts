@@ -45,19 +45,15 @@ await fastify.register(fastifyCookie, {
   secret: env.JWT_REFRESH_SECRET,
 });
 
-fastify.addContentTypeParser(
-  "application/json",
-  { parseAs: "buffer" },
-  function (req, body, done) {
-    try {
-      req.rawBody = body as Buffer;
-      const json = JSON.parse(body.toString());
-      done(null, json);
-    } catch (err) {
-      done(err as Error, undefined);
-    }
-  },
-);
+fastify.addContentTypeParser("application/json", { parseAs: "buffer" }, function (req, body, done) {
+  try {
+    req.rawBody = body as Buffer;
+    const json: unknown = JSON.parse(body.toString());
+    done(null, json);
+  } catch (err) {
+    done(err instanceof Error ? err : new Error(String(err)), undefined);
+  }
+});
 
 fastify.register(webhookRoutes, { prefix: "/api" });
 fastify.register(authRoutes, { prefix: "/api" });
@@ -78,4 +74,4 @@ const start = async () => {
     process.exit(1);
   }
 };
-start();
+void start();

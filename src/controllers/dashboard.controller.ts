@@ -1,11 +1,9 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import { getTransactions } from "../services/transaction.service";
 import { paginationSchema } from "../validators/payment.validator";
+import { getErrorMessage } from "../utils/errors";
 
-export const getDashboardTransactions = async (
-  req: FastifyRequest,
-  reply: FastifyReply,
-) => {
+export const getDashboardTransactions = async (req: FastifyRequest, reply: FastifyReply) => {
   const parsed = paginationSchema.safeParse(req.query);
   if (!parsed.success) {
     req.log.warn({ errors: parsed.error.issues, msg: "Invalid pagination params" });
@@ -23,8 +21,8 @@ export const getDashboardTransactions = async (
       msg: "Transactions fetched successfully",
     });
     return reply.status(200).send({ transactions: transaction });
-  } catch (err: any) {
-    req.log.error({ err: err.message, msg: "Failed to fetch transactions" });
+  } catch (err) {
+    req.log.error({ err: getErrorMessage(err), msg: "Failed to fetch transactions" });
     return reply.status(500).send({ message: "Internal server error" });
   }
 };

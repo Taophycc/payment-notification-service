@@ -1,4 +1,4 @@
-import { FastifyRequest } from "fastify";
+export {};
 declare module "fastify" {
   interface FastifyRequest {
     rawBody?: Buffer;

@@ -10,10 +10,7 @@ const hashToken = (token: string) =>
   crypto.createHmac("sha256", env.JWT_REFRESH_SECRET).update(token).digest("hex");
 
 export const registerUser = async (email: string, password: string) => {
-  const existingUser = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, email));
+  const existingUser = await db.select().from(users).where(eq(users.email, email));
   if (existingUser.length > 0) {
     throw new Error("Email already exists");
   }
@@ -31,10 +28,7 @@ export const registerUser = async (email: string, password: string) => {
 };
 
 export const loginUser = async (email: string, password: string) => {
-  const existingUser = await db
-    .select()
-    .from(users)
-    .where(eq(users.email, email));
+  const existingUser = await db.select().from(users).where(eq(users.email, email));
 
   if (existingUser.length === 0) {
     throw new Error("Invalid credentials");
@@ -48,21 +42,12 @@ export const loginUser = async (email: string, password: string) => {
   return existingUser[0];
 };
 
-export const saveRefreshToken = async (
-  userId: string,
-  refreshToken: string,
-) => {
+export const saveRefreshToken = async (userId: string, refreshToken: string) => {
   const hashed = hashToken(refreshToken);
-  await db
-    .update(users)
-    .set({ refreshToken: hashed })
-    .where(eq(users.id, userId));
+  await db.update(users).set({ refreshToken: hashed }).where(eq(users.id, userId));
 };
 
-export const rotateRefreshToken = async (
-  userId: string,
-  refreshToken: string,
-) => {
+export const rotateRefreshToken = async (userId: string, refreshToken: string) => {
   const user = await db.select().from(users).where(eq(users.id, userId));
 
   if (user.length === 0) {
@@ -70,10 +55,7 @@ export const rotateRefreshToken = async (
   }
 
   if (user[0].refreshToken !== hashToken(refreshToken)) {
-    await db
-      .update(users)
-      .set({ refreshToken: null })
-      .where(eq(users.id, userId));
+    await db.update(users).set({ refreshToken: null }).where(eq(users.id, userId));
     throw new Error("Invalid refresh token");
   }
 
@@ -81,8 +63,5 @@ export const rotateRefreshToken = async (
 };
 
 export const logOutUser = async (userId: string) => {
-  await db
-    .update(users)
-    .set({ refreshToken: null })
-    .where(eq(users.id, userId));
+  await db.update(users).set({ refreshToken: null }).where(eq(users.id, userId));
 };

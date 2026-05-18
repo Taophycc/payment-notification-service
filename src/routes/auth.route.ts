@@ -1,10 +1,5 @@
 import { FastifyInstance } from "fastify";
-import {
-  register,
-  login,
-  refresh,
-  logOut,
-} from "../controllers/auth.controller";
+import { register, login, refresh, logOut } from "../controllers/auth.controller";
 import { authenticate } from "../middleware/authenticate";
 import { config } from "../config/index";
 

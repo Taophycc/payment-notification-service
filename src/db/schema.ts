@@ -9,17 +9,9 @@ import {
   text,
 } from "drizzle-orm/pg-core";
 
-export const paymentStatusEnum = pgEnum("payment_status", [
-  "pending",
-  "success",
-  "failed",
-]);
+export const paymentStatusEnum = pgEnum("payment_status", ["pending", "success", "failed"]);
 
-export const notificationStatusEnum = pgEnum("notification_status", [
-  "pending",
-  "sent",
-  "failed",
-]);
+export const notificationStatusEnum = pgEnum("notification_status", ["pending", "sent", "failed"]);
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -31,9 +23,7 @@ export const users = pgTable("users", {
 
 export const transactions = pgTable("transactions", {
   id: uuid("id").primaryKey().defaultRandom(),
-  paystackReference: varchar("paystack_reference", { length: 255 })
-    .notNull()
-    .unique(),
+  paystackReference: varchar("paystack_reference", { length: 255 }).notNull().unique(),
   rawPayload: jsonb("raw_payload").notNull(),
   customerEmail: varchar("customer_email", { length: 255 }),
   eventType: varchar(),

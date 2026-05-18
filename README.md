@@ -156,45 +156,45 @@ Then visit `http://localhost:3000/login` to access the dashboard.
 
 ### Auth
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/auth/register` | Register admin user | No |
-| POST | `/api/auth/login` | Login and receive tokens | No |
-| POST | `/api/auth/refresh` | Rotate refresh token | No |
-| POST | `/api/auth/logout` | Logout and clear session | Yes |
+| Method | Endpoint             | Description              | Auth Required |
+| ------ | -------------------- | ------------------------ | ------------- |
+| POST   | `/api/auth/register` | Register admin user      | No            |
+| POST   | `/api/auth/login`    | Login and receive tokens | No            |
+| POST   | `/api/auth/refresh`  | Rotate refresh token     | No            |
+| POST   | `/api/auth/logout`   | Logout and clear session | Yes           |
 
 ### Webhook
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/webhook` | Receive Paystack webhook events | No (HMAC verified) |
+| Method | Endpoint       | Description                     | Auth Required      |
+| ------ | -------------- | ------------------------------- | ------------------ |
+| POST   | `/api/webhook` | Receive Paystack webhook events | No (HMAC verified) |
 
 ### Payments
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/payments/initialize` | Initialize a Paystack payment | No |
-| GET | `/api/payments/verify/:reference` | Verify a payment by reference | No |
+| Method | Endpoint                          | Description                   | Auth Required |
+| ------ | --------------------------------- | ----------------------------- | ------------- |
+| POST   | `/api/payments/initialize`        | Initialize a Paystack payment | No            |
+| GET    | `/api/payments/verify/:reference` | Verify a payment by reference | No            |
 
 ### Dashboard
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/api/dashboard/transactions` | Get paginated transactions | Yes |
+| Method | Endpoint                      | Description                | Auth Required |
+| ------ | ----------------------------- | -------------------------- | ------------- |
+| GET    | `/api/dashboard/transactions` | Get paginated transactions | Yes           |
 
 ### UI
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/login` | Admin login page |
-| GET | `/dashboard` | SSR transactions dashboard |
-| GET | `/logout` | Clear session and redirect to login |
+| Method | Endpoint     | Description                         |
+| ------ | ------------ | ----------------------------------- |
+| GET    | `/login`     | Admin login page                    |
+| GET    | `/dashboard` | SSR transactions dashboard          |
+| GET    | `/logout`    | Clear session and redirect to login |
 
 ### Health
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/health` | Server and database health check |
+| Method | Endpoint  | Description                      |
+| ------ | --------- | -------------------------------- |
+| GET    | `/health` | Server and database health check |
 
 ### Pagination
 

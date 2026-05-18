@@ -33,10 +33,7 @@ export const sendPaymentNotification = async (
   try {
     await resend.emails.send({
       from: "onboarding@resend.dev",
-      to:
-        env.NODE_ENV === "production"
-          ? body.data.customer.email
-          : env.TEST_EMAIL!,
+      to: env.NODE_ENV === "production" ? body.data.customer.email : env.TEST_EMAIL!,
       subject: "Payment Confirmed",
       html,
     });

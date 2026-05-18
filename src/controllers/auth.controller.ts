@@ -10,6 +10,7 @@ import { z } from "zod";
 import { registerSchema, loginSchema } from "../validators/auth.validator";
 import { config } from "../config/index";
 import { env } from "../config/env";
+import { getErrorMessage } from "../utils/errors";
 
 export const register = async (req: FastifyRequest, reply: FastifyReply) => {
   const body = registerSchema.safeParse(req.body);
@@ -36,27 +37,20 @@ export const register = async (req: FastifyRequest, reply: FastifyReply) => {
     });
 
     const { passwordHash, refreshToken, ...safeUser } = user;
-    return reply
-      .status(201)
-      .send({ message: "User registered successfully", user: safeUser });
-  } catch (err: any) {
-    req.log.error({
-      err: err.message,
-      email,
-      msg: "Registration failed unexpectedly",
-    });
-    if (err.message === "Email already exists") {
+    return reply.status(201).send({ message: "User registered successfully", user: safeUser });
+  } catch (err) {
+    const message = getErrorMessage(err);
+    req.log.error({ err: message, email, msg: "Registration failed unexpectedly" });
+    if (message === "Email already exists") {
       req.log.warn({ email, msg: "Registration attempt with existing email" });
-      return reply.status(409).send({ message: err.message });
+      return reply.status(409).send({ message });
     }
-
     return reply.status(500).send({ message: "Internal server error" });
   }
 };
 
 export const login =
-  (fastify: FastifyInstance) =>
-  async (req: FastifyRequest, reply: FastifyReply) => {
+  (fastify: FastifyInstance) => async (req: FastifyRequest, reply: FastifyReply) => {
     const body = loginSchema.safeParse(req.body);
 
     if (!body.success) {
@@ -100,27 +94,19 @@ export const login =
       });
 
       return reply.status(200).send({ accessToken });
-    } catch (err: any) {
-      req.log.error({
-        err: err.message,
-        email,
-        msg: "Login failed unexpectedly",
-      });
-      if (err.message === "Invalid credentials") {
-        req.log.warn({
-          email,
-          ip: req.ip,
-          msg: "Failed login attempt - invalid credentials",
-        });
-        return reply.status(401).send({ message: err.message });
+    } catch (err) {
+      const message = getErrorMessage(err);
+      req.log.error({ err: message, email, msg: "Login failed unexpectedly" });
+      if (message === "Invalid credentials") {
+        req.log.warn({ email, ip: req.ip, msg: "Failed login attempt - invalid credentials" });
+        return reply.status(401).send({ message });
       }
       return reply.status(500).send({ message: "Internal server error" });
     }
   };
 
 export const refresh =
-  (fastify: FastifyInstance) =>
-  async (req: FastifyRequest, reply: FastifyReply) => {
+  (fastify: FastifyInstance) => async (req: FastifyRequest, reply: FastifyReply) => {
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
@@ -128,7 +114,7 @@ export const refresh =
     }
 
     try {
-      const decoded = fastify.jwt.verify(refreshToken) as { id: string };
+      const decoded = fastify.jwt.verify<{ id: string }>(refreshToken);
 
       const user = await rotateRefreshToken(decoded.id, refreshToken);
 
@@ -157,11 +143,9 @@ export const refresh =
       });
 
       return reply.status(200).send({ accessToken: newAccessToken });
-    } catch (err) {
+    } catch (_err) {
       req.log.warn({ msg: "Invalid or expired refresh token attempt" });
-      return reply
-        .status(401)
-        .send({ message: "Invalid or expired refresh token" });
+      return reply.status(401).send({ message: "Invalid or expired refresh token" });
     }
   };
 

@@ -38,15 +38,12 @@ export const initializePayment = async (
 };
 
 export const verifyPayment = async (reference: string) => {
-  const response = await fetch(
-    `${PAYSTACK_BASE_URL}/transaction/verify/${reference}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${env.PAYSTACK_SECRET_KEY}`,
-      },
+  const response = await fetch(`${PAYSTACK_BASE_URL}/transaction/verify/${reference}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${env.PAYSTACK_SECRET_KEY}`,
     },
-  );
+  });
 
   const data = (await response.json()) as {
     status: boolean;

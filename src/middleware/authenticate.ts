@@ -1,20 +1,14 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 
-export const authenticate = async (
-  request: FastifyRequest,
-  reply: FastifyReply,
-) => {
+export const authenticate = async (request: FastifyRequest, reply: FastifyReply) => {
   try {
     await request.jwtVerify();
-  } catch (err) {
+  } catch (_err) {
     return reply.status(401).send({ message: "Unauthorized" });
   }
 };
 
-export const authenticateUI = async (
-  request: FastifyRequest,
-  reply: FastifyReply,
-) => {
+export const authenticateUI = async (request: FastifyRequest, reply: FastifyReply) => {
   try {
     const token = request.cookies.accessToken;
 
@@ -22,12 +16,9 @@ export const authenticateUI = async (
       return reply.redirect("/login");
     }
 
-    const decoded = request.server.jwt.verify(token) as {
-      id: string;
-      email: string;
-    };
+    const decoded = request.server.jwt.verify<{ id: string; email: string }>(token);
     request.user = decoded;
-  } catch (err) {
+  } catch (_err) {
     return reply.redirect("/login");
   }
 };

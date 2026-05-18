@@ -12,7 +12,7 @@ export default async function healthRoutes(fastify: FastifyInstance) {
         uptime: process.uptime(),
         timestamp: new Date().toISOString(),
       });
-    } catch (err) {
+    } catch (_err) {
       return reply.status(503).send({
         status: "error",
         database: "disconnected",
