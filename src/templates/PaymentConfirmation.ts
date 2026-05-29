@@ -4,7 +4,7 @@ export const paymentConfirmationTemplate = (data: {
   currency: string;
   reference: string;
   date: string;
-}) => `
+}) : string => `
   <div style="font-family: -apple-system, sans-serif; max-width: 560px; margin: 40px auto; background: #fff; border-radius: 8px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
     <h2 style="color: #1a1a1a; margin: 0 0 20px;">Payment Confirmed ✓</h2>
     <hr style="border: none; border-top: 1px solid #e6ebf1; margin: 20px 0;" />
