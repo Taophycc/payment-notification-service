@@ -20,7 +20,8 @@
     "docker:up": "docker compose up --remove-orphans",
     "docker:up:build": "docker compose up --build --remove-orphans",
     "docker:down": "docker compose down",
-    "docker:down:v": "docker compose down -v"
+    "docker:down:v": "docker compose down -v",
+    "typecheck": "tsc --noEmit"
   },
   "keywords": [],
   "author": "",
