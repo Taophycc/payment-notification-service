@@ -5,6 +5,7 @@ import { notifications } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { paymentConfirmationTemplate } from "../templates/paymentConfirmation";
 import { PaystackWebhookInput } from "../validators/webhook.validator";
+import { getErrorMessage } from "../utils/errors";
 
 const resend = new Resend(env.RESEND_API_KEY);
 
@@ -12,7 +13,7 @@ export const sendPaymentNotification = async (
   body: PaystackWebhookInput,
   transactionId: string,
 ) => {
-  const [notification] = await db
+  const [notification] = (await db
     .insert(notifications)
     .values({
       paymentId: transactionId,
@@ -20,7 +21,15 @@ export const sendPaymentNotification = async (
       status: "pending",
       message: `Payment of ${body.data.amount / 100} ${body.data.currency} confirmed`,
     })
-    .returning();
+    .returning()) as Array<{
+    id: string;
+    paymentId: string;
+    type: string;
+    status: string;
+    message: string | null;
+    sentAt: Date | null;
+    createdAt: Date;
+  }>;
 
   const html = paymentConfirmationTemplate({
     firstName: body.data.customer.first_name ?? "Customer",
@@ -48,6 +57,6 @@ export const sendPaymentNotification = async (
       .set({ status: "failed" })
       .where(eq(notifications.id, notification.id));
 
-    console.error("Failed to send notification email:", err);
+    console.error("Failed to send notification email:", getErrorMessage(err));
   }
 };

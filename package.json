@@ -21,7 +21,8 @@
     "docker:up:build": "docker compose up --build --remove-orphans",
     "docker:down": "docker compose down",
     "docker:down:v": "docker compose down -v",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "ci": "pnpm install --frozen-lockfile && pnpm lint && pnpm exec tsc --noEmit && pnpm test && pnpm build"
   },
   "keywords": [],
   "author": "",
