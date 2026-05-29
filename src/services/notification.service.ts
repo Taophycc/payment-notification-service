@@ -13,7 +13,7 @@ export const sendPaymentNotification = async (
   body: PaystackWebhookInput,
   transactionId: string,
 ) => {
-  const [notification] = (await db
+  const notifications_result = await db
     .insert(notifications)
     .values({
       paymentId: transactionId,
@@ -21,15 +21,13 @@ export const sendPaymentNotification = async (
       status: "pending",
       message: `Payment of ${body.data.amount / 100} ${body.data.currency} confirmed`,
     })
-    .returning()) as Array<{
-    id: string;
-    paymentId: string;
-    type: string;
-    status: string;
-    message: string | null;
-    sentAt: Date | null;
-    createdAt: Date;
-  }>;
+    .returning();
+
+  const notification = notifications_result[0];
+
+  if (!notification) {
+    throw new Error("Failed to create notification record");
+  }
 
   const html = paymentConfirmationTemplate({
     firstName: body.data.customer.first_name ?? "Customer",
