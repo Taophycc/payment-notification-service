@@ -1,16 +1,10 @@
 import { db } from "../db/index";
 import { transactions } from "../db/schema";
 import { PaystackWebhookInput } from "../validators/webhook.validator";
+import { deriveStatus } from "./transaction.helpers";
 import { desc } from "drizzle-orm";
 
-const validStatuses = ["pending", "success", "failed"] as const;
-type ValidStatus = (typeof validStatuses)[number];
-
 export const createTransaction = async (body: PaystackWebhookInput) => {
-  const status = validStatuses.includes(body.data.status as ValidStatus)
-    ? (body.data.status as ValidStatus)
-    : "pending";
-
   const [transaction] = await db
     .insert(transactions)
     .values({
@@ -19,7 +13,7 @@ export const createTransaction = async (body: PaystackWebhookInput) => {
       currency: body.data.currency,
       customerEmail: body.data.customer.email,
       eventType: body.event,
-      status,
+      status: deriveStatus(body.data.status),
       rawPayload: body,
     })
     .onConflictDoNothing()

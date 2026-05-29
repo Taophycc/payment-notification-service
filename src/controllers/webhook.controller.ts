@@ -7,7 +7,7 @@ import { paystackWebhookSchema } from "../validators/webhook.validator";
 const chargeEvents = ["charge.success", "charge.failed", "charge.pending"];
 
 export const handleWebhook = async (req: FastifyRequest, reply: FastifyReply) => {
-  if (!verifySignature(req)) {
+  if (!verifySignature(req.rawBody, req.headers["x-paystack-signature"] as string | undefined)) {
     req.log.warn({ msg: "Invalid signature detected", ip: req.ip });
     return reply.status(401).send({ message: "Invalid signature" });
   }
