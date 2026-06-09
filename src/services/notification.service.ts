@@ -7,13 +7,15 @@ import { paymentConfirmationTemplate } from "../templates/paymentConfirmation";
 import { PaystackWebhookInput } from "../validators/webhook.validator";
 import { getErrorMessage } from "../utils/errors";
 
+type Notification = typeof notifications.$inferSelect;
+
 const resend = new Resend(env.RESEND_API_KEY);
 
 export const sendPaymentNotification = async (
   body: PaystackWebhookInput,
   transactionId: string,
-) => {
-  const notifications_result = await db
+): Promise<void> => {
+  const notifications_result: Notification[] = await db
     .insert(notifications)
     .values({
       paymentId: transactionId,
@@ -23,7 +25,7 @@ export const sendPaymentNotification = async (
     })
     .returning();
 
-  const notification = notifications_result[0];
+  const notification: Notification | undefined = notifications_result[0];
 
   if (!notification) {
     throw new Error("Failed to create notification record");
